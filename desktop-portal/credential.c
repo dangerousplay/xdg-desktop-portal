@@ -164,6 +164,11 @@ static gboolean handle_create_credential(XdpDbusExperimentalCredential *object,
     return G_DBUS_METHOD_INVOCATION_HANDLED;
   }
 
+  /* Let the handler export org.freedesktop.impl.portal.Request at this path,
+   * so that closing the request cancels the ceremony. */
+  g_variant_builder_add(&options, "{sv}", "request_handle",
+                        g_variant_new_object_path(request->id));
+
   xdp_request_set_impl_request(request, handler_request);
   xdp_request_export(request,
                      g_dbus_method_invocation_get_connection(invocation));
@@ -236,6 +241,11 @@ static gboolean handle_get_credential(XdpDbusExperimentalCredential *object,
     g_dbus_method_invocation_return_gerror(invocation, error);
     return G_DBUS_METHOD_INVOCATION_HANDLED;
   }
+
+  /* Let the handler export org.freedesktop.impl.portal.Request at this path,
+   * so that closing the request cancels the ceremony. */
+  g_variant_builder_add(&options, "{sv}", "request_handle",
+                        g_variant_new_object_path(request->id));
 
   xdp_request_set_impl_request(request, handler_request);
   xdp_request_export(request,
